@@ -10,6 +10,7 @@
 #
 # v1.0		adds support to -h
 # v1.1		adds support to -V (version)
+# v1.2    fixes the bug when no params is passed
 ##############################################################################
 
 CURRENT_VERSION="v1.1"
@@ -34,8 +35,11 @@ case "$1" in
   ;;
 
    *)
-     echo "invalid option: $1"
-     exit 1
+    if test -n "$1"
+    then 
+      echo "invalid option: $1"
+      exit 1
+    fi
   ;;
 esac
 
