@@ -11,26 +11,29 @@
 # v1.0		adds support to -h
 # v1.1		adds support to -V (version)
 # v1.2    fixes the bug when no params is passed
+# v1.3    fixes the program basename
+#         adds --help and --version
+# v1.4    adds automatic grepped version
 ##############################################################################
 
-CURRENT_VERSION="v1.1"
-
 USE_MESSAGE="
-Use $0 [-h]
 
-  -h	shows help
-  -V	shows current version
+Use $(basename "$0") [-h|-V]
+
+  -h  --help      shows help
+  -V  --version   shows current version
 
 "
 
 case "$1" in
-  -h)
-    echo $USE_MESSAGE
+  -h | --help)
+    echo "$USE_MESSAGE"
     exit 0
   ;;
 
-  -V)	
-    echo $CURRENT_VERSION
+  -V | --version)	
+    # Shows version from file header
+    grep '^# v' "$0" | tail -1 | cut -d : -f 1 | tr -d \#
     exit 0
   ;;
 
