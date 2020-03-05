@@ -15,7 +15,8 @@
 #         adds --help and --version
 # v1.4    adds automatic grepped version
 # v1.5    adds sort option
-##############################################################################
+# v1.6    adds invert and uppercase options
+###############################################################################
 
 USE_MESSAGE="
 
@@ -24,43 +25,64 @@ Use $(basename "$0") [-h|-V]
   -h  --help      shows help
   -V  --version   shows current version
   -s  --sort      sort 
+  -i  --invert    invert printing order
+  -u  --upper     print uppercase
 
 "
 
 should_sort=0
+should_invert=0
+should_upper=0
 
-case "$1" in
-  -h | --help)
-    echo "$USE_MESSAGE"
-    exit 0
-  ;;
+while test -n "$1" 
+do
+  case "$1" in
+    -h | --help)
+      echo "$USE_MESSAGE"
+      exit 0
+    ;;
 
-  -V | --version)	
-    # Shows version from file header
-    grep '^# v' "$0" | tail -1 | cut -d : -f 1 | tr -d \#
-    exit 0
-  ;;
+    -V | --version)	
+      # Shows version from file header
+      grep '^# v' "$0" | tail -1 | cut -d : -f 1 | tr -d \#
+      exit 0
+    ;;
 
-  -s | --sort)
-    should_sort=1
-  ;;
+    -s | --sort)
+      should_sort=1
+    ;;
 
-  *)
-    if test -n "$1"
-    then 
-      echo "invalid option: $1"
-      exit 1
-    fi
-  ;;
-esac
+    -i | --invert)
+      should_invert=1
+    ;;
 
-result=$(cut -d : -f 1,5 /etc/passwd | tr : \\t\\t)
+    -u | --upper)
+      should_upper=1
+    ;;
+  esac
+
+  shift   # forces $N to become $SN-1
+done
+
+result=$(cut -d : -f 1,5 /etc/passwd | tr : \\t)
 
 if test "$should_sort" = 1
 then
-  echo "$result" | sort
-else 
-  echo "$result"
+  result=$(echo "$result" | sort)
 fi
+
+
+if test "$should_invert" = 1 
+then
+  result=$(echo "$result" | tac)
+fi
+
+if test "$should_upper" = 1
+then
+  result=$(echo "$result" | tr a-z A-Z)
+fi
+
+echo "=============================================================================="
+echo "$result"
 
 exit 0
